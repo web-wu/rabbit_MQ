@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd
+">
+
+    <context:property-placeholder location="classpath:rabbit.properties"></context:property-placeholder>
+
+    <rabbit:connection-factory id="factory"
+                               host="${rabbit.Host}"
+                               port="${rabbit.Port}"
+                               virtual-host="${rabbit.VirtualHost}"
+                               username="${rabbit.username}"
+                               password="${rabbit.password}"/>
+
+    <rabbit:admin connection-factory="factory"></rabbit:admin>
+
+    <rabbit:template id="rabbitTemplate" connection-factory="factory"></rabbit:template>
+
+
+    <bean id="queue_1_listener" class="com.tab.MQ.queueListener.Fanout_1_listener"></bean>
+    <bean id="queue_2_listener" class="com.tab.MQ.queueListener.Fanout_2_listener"></bean>
+
+    <rabbit:listener-container connection-factory="factory" auto-declare="true">
+        <rabbit:listener ref="queue_1_listener" queue-names="fanout_queue_1"></rabbit:listener>
+        <rabbit:listener ref="queue_2_listener" queue-names="fanout_queue_2"></rabbit:listener>
+    </rabbit:listener-container>
+
+</beans>
